@@ -3,6 +3,7 @@ package dufu
 import (
 	"encoding/binary"
 	"fmt"
+	"time"
 )
 
 const (
@@ -66,6 +67,16 @@ func (b IPv4) Message() []byte            { return b[b.HeaderLength()*4:] }
 // L3Layer is a IP layer.
 type L3Layer struct {
 	*L2Layer
+	*linkAddrCache
+}
+
+var L3 *L3Layer
+
+func NewL3Layer(l2 *L2Layer) *L3Layer {
+	return &L3{
+		l2,
+		newLinkAddrCache(time.Minute),
+	}
 }
 
 // IPHandle handles IP packet.
@@ -86,6 +97,9 @@ func (l3 *L3Layer) IPSend(skb *SkBuff) {
 	ip.SetVersion(4)
 	ip.SetTotalLength(uint16(len(skb.Data())))
 	ip.SetIdentification(uint16(IpSelectIdent(ip)))
+	sh := l3.linkAddrCache.get([4]byte(ip.SourceAddrss()))
+	dh := l3.linkAddrCache.get([4]byte(ip.DestinationAddress()))
+
 }
 
 // ipv4Checksum get buf checksum based on rfc1071

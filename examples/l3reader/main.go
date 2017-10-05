@@ -1,14 +1,11 @@
 package main
 
-import (
-	"github.com/ggaaooppeenngg/dufu"
-)
+import "fmt"
 
 func main() {
 	tap, err := dufu.NewTAP("tap_dufu")
 	if err != nil {
 		panic(err)
 	}
-	_ := NewL2Layer(tap)
-	select {}
+	l3 := NewL3Layer(NewL2Layer(tap))
 }

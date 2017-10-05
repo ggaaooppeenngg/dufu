@@ -17,6 +17,11 @@ type L2Layer struct {
 	*TapDevice
 }
 
+func NewL2Layer(tap *TapDevice) {
+	l2 := &dufu.L2Layer{TapDevice: tap}
+	go l2.Loop()
+}
+
 // Link layer frame
 type Frame []byte
 
